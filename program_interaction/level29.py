@@ -13,6 +13,7 @@ s.process(["gcc",'-o', '/home/hacker/pwncollege', "/tmp/pwncollege.c"])
 
 p = s.process(['/home/hacker/pwncollege'])
 r = p.clean(timeout=2)
+#p.sendline('dremewyh')
 res=repr(r)
 print(res)
 
