@@ -9,10 +9,8 @@ p=ssh.process('/challenge/run')
 
 shellcode= asm('''
                .intel_syntax noprefix
-               mov rax, rdi
-               mov r8, rsi
-               div r8
-               mov rax, rdx 
+               mov al, dil
+               mov bx, si
                ''',arch='amd64')
 
 print(disasm(shellcode, arch = 'amd64'))
