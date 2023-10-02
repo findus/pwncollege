@@ -9,11 +9,10 @@ p=ssh.process('/challenge/run')
 
 shellcode= asm('''
                .intel_syntax noprefix
-                mov rax, [0x404000]
-                mov rdi, [0x404000]
-                add rdi, 0x1337
-                mov rbx, 0x404000
-                mov [rbx], rdi
+                mov al, [0x404000]
+                mov bx, [0x404000]
+                mov ecx, [0x404000]
+                mov rdx, [0x404000]
                ''',arch='amd64')
 
 print(disasm(shellcode, arch = 'amd64'))
@@ -24,42 +23,41 @@ shellcode=bytes(shellcode)
 p.send(shellcode)
 print(p.recvall().decode("UTF-8"))
 
-#Welcome to ASMLevel10
-#==================================================
-#...
-#Up until now you have worked with registers as the only way for storing things, essentially
-#variables like 'x' in math. Recall that memory can be addressed. Each address contains something
-#at that location, like real addresses! As an example: the address '699 S Mill Ave, Tempe, AZ 85281'
-#maps to the 'ASU Campus'. We would also say it points to 'ASU Campus'.  We can represent this like:
-#['699 S Mill Ave, Tempe, AZ 85281'] = 'ASU Campus'
-#The address is special because it is unique. But that also does not mean other address cant point to
-#the same thing (as someone can have multiple houses). Memory is exactly the same! For instance,
-#the address in memory that your code is stored (when we take it from you) is 0x400000.
-#In x86 we can access the thing at a memory location, called dereferencing, like so:
-#mov rax, [some_address]        <=>     Moves the thing at 'some_address' into rax
-#This also works with things in registers:
-#mov rax, [rdi]         <=>     Moves the thing stored at the address of what rdi holds to rax
-#This works the same for writing:
-#mov [rax], rdi         <=>     Moves rdi to the address of what rax holds.
-#So if rax was 0xdeadbeef, then rdi would get stored at the address 0xdeadbeef:
-#[0xdeadbeef] = rdi
-#Note: memory is linear, and in x86_64, it goes from 0 - 0xffffffffffffffff (yes, huge).
+#MSB                                    LSB
+#+----------------------------------------+
+#|                   rax                  |
+#+--------------------+-------------------+
+#                     |        eax        |
+#                     +---------+---------+
+#                               |   ax    |
+#                               +----+----+
+#                               | ah | al |
+#                               +----+----+
+
+#In this level you will be working with memory. This will require you to read or write
+#to things stored linearly in memory. If you are confused, go look at the linear
+#addressing module in 'ike. You may also be asked to dereference things, possibly multiple
+#times, to things we dynamically put in memory for your use.
+#
+#
+#
+#Recall that registers in x86_64 are 64 bits wide, meaning they can store 64 bits in them.
+#Similarly, each memory location is 64 bits wide. We refer to something that is 64 bits
+#(8 bytes) as a quad word. Here is the breakdown of the names of memory sizes:
+#* Quad Word = 8 Bytes = 64 bits
+#* Double Word = 4 bytes = 32 bits
+#* Word = 2 bytes = 16 bits
+#* Byte = 1 byte = 8 bits
+#In x86_64, you can access each of these sizes when dereferencing an address, just like using
+#bigger or smaller register accesses:
+#mov al, [address]        <=>         moves the least significant byte from address to rax
+#mov ax, [address]        <=>         moves the least significant word from address to rax
+#mov eax, [address]        <=>         moves the least significant double word from address to rax
+#mov rax, [address]        <=>         moves the full quad word from address to rax
+#Remember that moving only into al for instance does not fully clear the upper bytes.
 #
 #Please perform the following:
-#1. Place the value stored at 0x404000 into rax
-#2. Increment the value stored at the address 0x404000 by 0x1337
-#Make sure the value in rax is the original value stored at 0x404000 and make sure
-#that [0x404000] now has the incremented value.
-#
-#We will now set the following in preparation for your code:
-#[0x404000] = 0xf5c2e
-#
-#Please give me your assembly in bytes (up to 0x1000 bytes): 
-#Executing your code...
-#---------------- CODE ----------------
-#0x400000:    and       rdi, 0xe
-#0x400004:    xor       rax, rdi
-#0x400007:    and       rax, 1
-#--------------------------------------
-#Failed in the following way: rax was expected to be 0xf5c2e, but instead was 0x0
-#Sorry, no flag :(.
+#1) Set rax to the byte at 0x404000
+#2) Set rbx to the word at 0x404000
+#3) Set rcx to the double word at 0x404000
+#4) Set rdx to the quad word at 0x404000
