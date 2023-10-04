@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pwn import *
+import re
 
 context.arch = 'amd64'
 #context.endian = 'little'
@@ -7,11 +8,70 @@ context.arch = 'amd64'
 ssh=ssh(host='pwn')
 p=ssh.process('/challenge/run')
 
-shellcode= asm('''
+#rsi is size of list
+
+code=   '''
                .intel_syntax noprefix
-                mov rax,0
-             
-               ''', arch='amd64')
+               push 0
+               mov rbp, rsp
+               sub rsp, rsi
+
+               sub rsi, 1
+               mov rax, -1
+
+               loop1:
+                add rax, 1
+                cmp rax, rsi
+                jg next
+                
+                mov rcx, 0 
+                mov cl,[rdi+rax] ; untere 8 bit von rcx setzen
+                
+                mov r11, rbp ; base stack pointer in r11 schreiben
+                sub r11, rcx ; stack pointer in position für bit bringen
+                mov dl, [r11] ; inhalt von stack in dl schreiben
+                add dl, 1 ; inhalt um 1 incrementen
+                mov [r11], dl ; inhalt wieder zurück schreiben
+                jmp loop1
+
+               next:
+                mov rax, 0
+                mov rbx, rax
+                mov rcx, rax
+                mov ax, -1
+               
+                loop2:
+                    add ax,1
+                    cmp ax,0xff
+                    jg return ; wenn b > 0xff return
+                    
+                    mov r11, rbp
+                    sub r11, rax
+                    mov dl,[r11]
+                    cmp dl,bl ; check if wert aus stack grösser
+                    jle loop2
+
+                    mov bl,dl
+                    mov cl,al 
+                    jmp loop2
+            
+            return:
+                mov rax, rcx
+                mov rsp, rbp
+                pop rbx
+                ret
+     
+               '''
+code=re.sub(';.*\\n','\\n',code)
+shellcode= asm(code, arch='amd64')
+
+print(disasm(shellcode, arch = 'amd64'))
+#print(bytes(shellcode))
+print('1', shellcode)
+shellcode=bytes(shellcode)
+#print('1', shellcode)
+p.send(shellcode)
+print(p.recvall().decode("UTF-8"))
 
 #You can even run all that together as one command:
 #as -o asm.o asm.S && objcopy -O binary --only-section=.text ./asm.o ./asm.bin && cat ./asm.bin | /challenge/run

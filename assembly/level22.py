@@ -37,8 +37,7 @@ shellcode= asm('''
                 ret      
                ''', arch='amd64')
 
-#somehow it works when I use the smaller registers
-
+#somehow it works when I use the 8 bit registers
 
 #intel_syntax noprefix
 #mov rax,0
@@ -51,7 +50,7 @@ shellcode= asm('''
 #cmp rbx,0
 #je done
 #nop
-#cmp rbx, 0xa
+#cmp rbx, 90
 #ja next
 #nop
 #mov rdi,rbx
