@@ -1,0 +1,221 @@
+GDB is a very powerful dynamic analysis tool which you can use in order to understand the state of a program throughout
+its execution. You will become familiar with some of gdb's capabilities in this module.
+
+As it turns out, gdb has FULL control over the target process. Not only can you analyze the program's state, but you can
+also modify it. While gdb probably isn't the best tool for doing long term maintenance on a program, sometimes it can be
+useful to quickly modify the behavior of your target process in order to more easily analyze it.
+
+You can modify the state of your target program with the `set` command. For example, you can use `set $rdi = 0` to zero
+out $rdi. You can use `set *((uint64_t *) $rsp) = 0x1234` to set the first value on the stack to 0x1234. You can use
+`set *((uint16_t *) 0x31337000) = 0x1337` to set 2 bytes at 0x31337000 to 0x1337.
+
+Suppose your target is some networked application which reads from some socket on fd 42. Maybe it would be easier for
+the purposes of your analysis if the target instead read from stdin. You could achieve something like that with the
+following gdb script:
+
+  start
+  catch syscall read
+  commands
+    silent
+    if ($rdi == 42)
+      set $rdi = 0
+    end
+    continue
+  end
+  continue
+
+This example gdb script demonstrates how you can automatically break on system calls, and how you can use conditions
+within your commands to conditionally perform gdb commands.
+
+In the previous level, your gdb scripting solution likely still required you to copy and paste your solutions. This
+time, try to write a script that doesn't require you to ever talk to the program, and instead automatically solves each
+challenge by correctly modifying registers / memory.
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x0000559dcd03acaf in main ()
+(gdb) c
+Continuing.
+
+Breakpoint 2, 0x0000559dcd03ad67 in main ()
+(gdb) disassemble 
+Dump of assembler code for function main:
+   0x0000559dcd03aaa6 <+0>:	endbr64 
+   0x0000559dcd03aaaa <+4>:	push   rbp
+   0x0000559dcd03aaab <+5>:	mov    rbp,rsp
+   0x0000559dcd03aaae <+8>:	sub    rsp,0x40
+   0x0000559dcd03aab2 <+12>:	mov    DWORD PTR [rbp-0x24],edi
+   0x0000559dcd03aab5 <+15>:	mov    QWORD PTR [rbp-0x30],rsi
+   0x0000559dcd03aab9 <+19>:	mov    QWORD PTR [rbp-0x38],rdx
+   0x0000559dcd03aabd <+23>:	mov    rax,QWORD PTR fs:0x28
+   0x0000559dcd03aac6 <+32>:	mov    QWORD PTR [rbp-0x8],rax
+   0x0000559dcd03aaca <+36>:	xor    eax,eax
+   0x0000559dcd03aacc <+38>:	cmp    DWORD PTR [rbp-0x24],0x0
+   0x0000559dcd03aad0 <+42>:	jg     0x559dcd03aaf1 <main+75>
+   0x0000559dcd03aad2 <+44>:	lea    rcx,[rip+0xe78]        # 0x559dcd03b951 <__PRETTY_FUNCTION__.5345>
+   0x0000559dcd03aad9 <+51>:	mov    edx,0x51
+   0x0000559dcd03aade <+56>:	lea    rsi,[rip+0x54c]        # 0x559dcd03b031
+   0x0000559dcd03aae5 <+63>:	lea    rdi,[rip+0x6d0]        # 0x559dcd03b1bc
+   0x0000559dcd03aaec <+70>:	call   0x559dcd03a1f0 <__assert_fail@plt>
+   0x0000559dcd03aaf1 <+75>:	lea    rdi,[rip+0x6cd]        # 0x559dcd03b1c5
+   0x0000559dcd03aaf8 <+82>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03aafd <+87>:	mov    rax,QWORD PTR [rbp-0x30]
+   0x0000559dcd03ab01 <+91>:	mov    rax,QWORD PTR [rax]
+   0x0000559dcd03ab04 <+94>:	mov    rsi,rax
+   0x0000559dcd03ab07 <+97>:	lea    rdi,[rip+0x6bb]        # 0x559dcd03b1c9
+   0x0000559dcd03ab0e <+104>:	mov    eax,0x0
+   0x0000559dcd03ab13 <+109>:	call   0x559dcd03a1d0 <printf@plt>
+   0x0000559dcd03ab18 <+114>:	lea    rdi,[rip+0x6a6]        # 0x559dcd03b1c5
+   0x0000559dcd03ab1f <+121>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ab24 <+126>:	mov    edi,0xa
+   0x0000559dcd03ab29 <+131>:	call   0x559dcd03a170 <putchar@plt>
+   0x0000559dcd03ab2e <+136>:	mov    rax,QWORD PTR [rip+0x24eb]        # 0x559dcd03d020 <stdin@@GLIBC_2.2.5>
+   0x0000559dcd03ab35 <+143>:	mov    ecx,0x0
+   0x0000559dcd03ab3a <+148>:	mov    edx,0x2
+   0x0000559dcd03ab3f <+153>:	mov    esi,0x0
+   0x0000559dcd03ab44 <+158>:	mov    rdi,rax
+   0x0000559dcd03ab47 <+161>:	call   0x559dcd03a240 <setvbuf@plt>
+   0x0000559dcd03ab4c <+166>:	mov    rax,QWORD PTR [rip+0x24bd]        # 0x559dcd03d010 <stdout@@GLIBC_2.2.5>
+   0x0000559dcd03ab53 <+173>:	mov    ecx,0x1
+   0x0000559dcd03ab58 <+178>:	mov    edx,0x2
+   0x0000559dcd03ab5d <+183>:	mov    esi,0x0
+   0x0000559dcd03ab62 <+188>:	mov    rdi,rax
+   0x0000559dcd03ab65 <+191>:	call   0x559dcd03a240 <setvbuf@plt>
+   0x0000559dcd03ab6a <+196>:	lea    rdi,[rip+0x66f]        # 0x559dcd03b1e0
+   0x0000559dcd03ab71 <+203>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ab76 <+208>:	lea    rdi,[rip+0x6db]        # 0x559dcd03b258
+   0x0000559dcd03ab7d <+215>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ab82 <+220>:	lea    rdi,[rip+0x72f]        # 0x559dcd03b2b8
+   0x0000559dcd03ab89 <+227>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ab8e <+232>:	lea    rdi,[rip+0x7a3]        # 0x559dcd03b338
+   0x0000559dcd03ab95 <+239>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ab9a <+244>:	lea    rdi,[rip+0x817]        # 0x559dcd03b3b8
+   0x0000559dcd03aba1 <+251>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03aba6 <+256>:	lea    rdi,[rip+0x873]        # 0x559dcd03b420
+   0x0000559dcd03abad <+263>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03abb2 <+268>:	lea    rdi,[rip+0x8df]        # 0x559dcd03b498
+--Type <RET> for more, q to quit, c to continue without paging--c
+   0x0000559dcd03abb9 <+275>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03abbe <+280>:	lea    rdi,[rip+0x94b]        # 0x559dcd03b510
+   0x0000559dcd03abc5 <+287>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03abca <+292>:	lea    rdi,[rip+0x997]        # 0x559dcd03b568
+   0x0000559dcd03abd1 <+299>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03abd6 <+304>:	lea    rdi,[rip+0xa03]        # 0x559dcd03b5e0
+   0x0000559dcd03abdd <+311>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03abe2 <+316>:	lea    rdi,[rip+0xa6b]        # 0x559dcd03b654
+   0x0000559dcd03abe9 <+323>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03abee <+328>:	lea    rdi,[rip+0xa76]        # 0x559dcd03b66b
+   0x0000559dcd03abf5 <+335>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03abfa <+340>:	lea    rdi,[rip+0xa72]        # 0x559dcd03b673
+   0x0000559dcd03ac01 <+347>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac06 <+352>:	lea    rdi,[rip+0xa7b]        # 0x559dcd03b688
+   0x0000559dcd03ac0d <+359>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac12 <+364>:	lea    rdi,[rip+0xa7a]        # 0x559dcd03b693
+   0x0000559dcd03ac19 <+371>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac1e <+376>:	lea    rdi,[rip+0xa79]        # 0x559dcd03b69e
+   0x0000559dcd03ac25 <+383>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac2a <+388>:	lea    rdi,[rip+0xa81]        # 0x559dcd03b6b2
+   0x0000559dcd03ac31 <+395>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac36 <+400>:	lea    rdi,[rip+0xa88]        # 0x559dcd03b6c5
+   0x0000559dcd03ac3d <+407>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac42 <+412>:	lea    rdi,[rip+0xa84]        # 0x559dcd03b6cd
+   0x0000559dcd03ac49 <+419>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac4e <+424>:	lea    rdi,[rip+0xa85]        # 0x559dcd03b6da
+   0x0000559dcd03ac55 <+431>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac5a <+436>:	lea    rdi,[rip+0xa7f]        # 0x559dcd03b6e0
+   0x0000559dcd03ac61 <+443>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac66 <+448>:	lea    rdi,[rip+0xa7e]        # 0x559dcd03b6eb
+   0x0000559dcd03ac6d <+455>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac72 <+460>:	lea    rdi,[rip+0xa77]        # 0x559dcd03b6f0
+   0x0000559dcd03ac79 <+467>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac7e <+472>:	lea    rdi,[rip+0xae3]        # 0x559dcd03b768
+   0x0000559dcd03ac85 <+479>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac8a <+484>:	lea    rdi,[rip+0xb17]        # 0x559dcd03b7a8
+   0x0000559dcd03ac91 <+491>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03ac96 <+496>:	lea    rdi,[rip+0xb83]        # 0x559dcd03b820
+   0x0000559dcd03ac9d <+503>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03aca2 <+508>:	lea    rdi,[rip+0xbef]        # 0x559dcd03b898
+   0x0000559dcd03aca9 <+515>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03acae <+520>:	int3   
+   0x0000559dcd03acaf <+521>:	nop
+   0x0000559dcd03acb0 <+522>:	mov    DWORD PTR [rbp-0x1c],0x0
+   0x0000559dcd03acb7 <+529>:	jmp    0x559dcd03ad67 <main+705>
+   0x0000559dcd03acbc <+534>:	mov    esi,0x0
+   0x0000559dcd03acc1 <+539>:	lea    rdi,[rip+0xc06]        # 0x559dcd03b8ce
+   0x0000559dcd03acc8 <+546>:	mov    eax,0x0
+   0x0000559dcd03accd <+551>:	call   0x559dcd03a250 <open@plt>
+   0x0000559dcd03acd2 <+556>:	mov    ecx,eax
+   0x0000559dcd03acd4 <+558>:	lea    rax,[rbp-0x18]
+   0x0000559dcd03acd8 <+562>:	mov    edx,0x8
+   0x0000559dcd03acdd <+567>:	mov    rsi,rax
+   0x0000559dcd03ace0 <+570>:	mov    edi,ecx
+   0x0000559dcd03ace2 <+572>:	call   0x559dcd03a210 <read@plt>
+   0x0000559dcd03ace7 <+577>:	lea    rdi,[rip+0xbf2]        # 0x559dcd03b8e0
+   0x0000559dcd03acee <+584>:	call   0x559dcd03a190 <puts@plt>
+   0x0000559dcd03acf3 <+589>:	lea    rdi,[rip+0xc06]        # 0x559dcd03b900
+   0x0000559dcd03acfa <+596>:	mov    eax,0x0
+   0x0000559dcd03acff <+601>:	call   0x559dcd03a1d0 <printf@plt>
+   0x0000559dcd03ad04 <+606>:	lea    rax,[rbp-0x10]
+   0x0000559dcd03ad08 <+610>:	mov    rsi,rax
+   0x0000559dcd03ad0b <+613>:	lea    rdi,[rip+0xbfd]        # 0x559dcd03b90f
+   0x0000559dcd03ad12 <+620>:	mov    eax,0x0
+   0x0000559dcd03ad17 <+625>:	call   0x559dcd03a260 <__isoc99_scanf@plt>
+   0x0000559dcd03ad1c <+630>:	mov    rax,QWORD PTR [rbp-0x10]
+   0x0000559dcd03ad20 <+634>:	mov    rsi,rax
+   0x0000559dcd03ad23 <+637>:	lea    rdi,[rip+0xbea]        # 0x559dcd03b914
+   0x0000559dcd03ad2a <+644>:	mov    eax,0x0
+   0x0000559dcd03ad2f <+649>:	call   0x559dcd03a1d0 <printf@plt>
+   0x0000559dcd03ad34 <+654>:	mov    rax,QWORD PTR [rbp-0x18]
+   0x0000559dcd03ad38 <+658>:	mov    rsi,rax
+   0x0000559dcd03ad3b <+661>:	lea    rdi,[rip+0xbe3]        # 0x559dcd03b925
+   0x0000559dcd03ad42 <+668>:	mov    eax,0x0
+   0x0000559dcd03ad47 <+673>:	call   0x559dcd03a1d0 <printf@plt>
+   0x0000559dcd03ad4c <+678>:	mov    rdx,QWORD PTR [rbp-0x10]
+   0x0000559dcd03ad50 <+682>:	mov    rax,QWORD PTR [rbp-0x18]
+   0x0000559dcd03ad54 <+686>:	cmp    rdx,rax
+   0x0000559dcd03ad57 <+689>:	je     0x559dcd03ad63 <main+701>
+   0x0000559dcd03ad59 <+691>:	mov    edi,0x1
+   0x0000559dcd03ad5e <+696>:	call   0x559dcd03a280 <exit@plt>
+   0x0000559dcd03ad63 <+701>:	add    DWORD PTR [rbp-0x1c],0x1
+=> 0x0000559dcd03ad67 <+705>:	cmp    DWORD PTR [rbp-0x1c],0x3f
+   0x0000559dcd03ad6b <+709>:	jle    0x559dcd03acbc <main+534>
+   0x0000559dcd03ad71 <+715>:	mov    eax,0x0
+   0x0000559dcd03ad76 <+720>:	call   0x559dcd03a97d <win>
+   0x0000559dcd03ad7b <+725>:	mov    eax,0x0
+   0x0000559dcd03ad80 <+730>:	mov    rcx,QWORD PTR [rbp-0x8]
+   0x0000559dcd03ad84 <+734>:	xor    rcx,QWORD PTR fs:0x28
+   0x0000559dcd03ad8d <+743>:	je     0x559dcd03ad94 <main+750>
+   0x0000559dcd03ad8f <+745>:	call   0x559dcd03a1c0 <__stack_chk_fail@plt>
+   0x0000559dcd03ad94 <+750>:	leave  
+   0x0000559dcd03ad95 <+751>:	ret    
+End of assembler dump.
+(gdb) print $ZF
+$1 = void
+(gdb) set $ZF = 6 
+(gdb) set $eflags |= (1 << $ZF) 
+(gdb) print $eflags
+$2 = [ PF ZF IF ]
+(gdb) i r efalgs
+Invalid register `efalgs'
+(gdb) i r eflags
+eflags         0x246               [ PF ZF IF ]
+(gdb) info registers eflags
+eflags         0x246               [ PF ZF IF ]
+(gdb) ni
+0x0000559dcd03ad6b in main ()
+(gdb) info registers eflags
+eflags         0x293               [ CF AF SF IF ]
+(gdb) set $eflags |= (1 << $ZF) 
+(gdb) info registers eflags
+eflags         0x2d3               [ CF AF ZF SF IF ]
+(gdb) ni
+0x0000559dcd03acbc in main ()
+(gdb) set $rip 0x0000559dcd03ad71
+A syntax error in expression, near `0x0000559dcd03ad71'.
+(gdb) jmp 0x0000559dcd03ad71
+Undefined command: "jmp".  Try "help".
+(gdb) jump 0x0000559dcd03ad71
+Function "0x0000559dcd03ad71" not defined.
+(gdb) jump *0x0000559dcd03ad71
+Continuing at 0x559dcd03ad71.
+You win! Here is your flag:
+pwn.college{IxjJ8EwtFyNwao-khSNEEhkdCbT.0VO0IDLzEjNzIzW}

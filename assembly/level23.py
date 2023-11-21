@@ -65,14 +65,6 @@ code=   '''
 code=re.sub(';.*\\n','\\n',code)
 shellcode= asm(code, arch='amd64')
 
-print(disasm(shellcode, arch = 'amd64'))
-#print(bytes(shellcode))
-print('1', shellcode)
-shellcode=bytes(shellcode)
-#print('1', shellcode)
-p.send(shellcode)
-print(p.recvall().decode("UTF-8"))
-
 #You can even run all that together as one command:
 #as -o asm.o asm.S && objcopy -O binary --only-section=.text ./asm.o ./asm.bin && cat ./asm.bin | /challenge/run
 #

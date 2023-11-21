@@ -1,0 +1,158 @@
+GDB is a very powerful dynamic analysis tool which you can use in order to understand the state of a program throughout
+its execution. You will become familiar with some of gdb's capabilities in this module.
+
+A critical part of dynamic analysis is getting your program to the state you are interested in analyzing. So far, these
+challenges have automatically set breakpoints for you to pause execution at states you may be interested in analyzing.
+It is important to be able to do this yourself.
+
+There are a number of ways to move forward in the program's execution. You can use the `stepi <n>` command, or `si <n>`
+for short, in order to step forward one instruction. You can use the `nexti <n>` command, or `ni <n>` for short, in
+order to step forward one instruction, while stepping over any function calls. The `<n>` parameter is optional, but
+allows you to perform multiple steps at once. You can use the `finish` command in order to finish the currently
+executing function. You can use the `break *<address>` parameterized command in order to set a breakpoint at the
+specified-address. You have already used the `continue` command, which will continue execution until the program hits a
+breakpoint.
+
+While stepping through a program, you may find it useful to have some values displayed to you at all times. There are
+multiple ways to do this. The simplest way is to use the `display/<n><u><f>` parameterized command, which follows
+exactly the same format as the `x/<n><u><f>` parameterized command. For example, `display/8i $rip` will always show you
+the next 8 instructions. On the other hand, `display/4gx $rsp` will always show you the first 4 values on the stack.
+Another option is to use the `layout regs` command. This will put gdb into its TUI mode and show you the contents of all
+of the registers, as well as nearby instructions.
+
+In order to solve this level, you must figure out a series of random values which will be placed on the stack. You are
+highly encouraged to try using combinations of `stepi`, `nexti`, `break`, `continue`, and `finish` to make sure you have
+a good internal understanding of these commands. The commands are all absolutely critical to navigating a program's
+execution.
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x000055f14cc05c73 in main ()
+(gdb) c
+Continuing.
+
+Breakpoint 2, 0x000055f14cc05d2b in main ()
+(gdb) c
+Continuing.
+
+Breakpoint 3, 0x000055f14cc05ca6 in main ()
+(gdb) x/10gx $rsp
+0x7ffc2f67f040:	0x0000000000000002	0x00007ffc2f67f188
+0x7ffc2f67f050:	0x00007ffc2f67f178	0x000000014cc05d60
+0x7ffc2f67f060:	0x0000000000000000	0x000055f14cc052a0
+0x7ffc2f67f070:	0x00007ffc2f67f170	0xf90dd1d47719db00
+0x7ffc2f67f080:	0x0000000000000000	0x00007fb57f356083
+(gdb) c
+Continuing.
+
+Breakpoint 4, 0x000055f14cc05cab in main ()
+(gdb) x/10gx $rsp
+0x7ffc2f67f040:	0x0000000000000002	0x00007ffc2f67f188
+0x7ffc2f67f050:	0x00007ffc2f67f178	0x000000014cc05d60
+0x7ffc2f67f060:	0x0000000000000000	0xcd323249cbc8cc04
+0x7ffc2f67f070:	0x00007ffc2f67f170	0xf90dd1d47719db00
+0x7ffc2f67f080:	0x0000000000000000	0x00007fb57f356083
+(gdb) c
+Continuing.
+The random value has been set!
+
+Random value: 0xcd323249cbc8cc04
+You input: cd323249cbc8cc04
+The correct answer is: cd323249cbc8cc04
+
+Breakpoint 2, 0x000055f14cc05d2b in main ()
+(gdb) c
+Continuing.
+
+Breakpoint 3, 0x000055f14cc05ca6 in main ()
+(gdb) x/10gx $rsp
+0x7ffc2f67f040:	0x0000000000000002	0x00007ffc2f67f188
+0x7ffc2f67f050:	0x00007ffc2f67f178	0x000000014cc05d60
+0x7ffc2f67f060:	0x0000000100000000	0xcd323249cbc8cc04
+0x7ffc2f67f070:	0xcd323249cbc8cc04	0xf90dd1d47719db00
+0x7ffc2f67f080:	0x0000000000000000	0x00007fb57f356083
+(gdb) c
+Continuing.
+
+Breakpoint 4, 0x000055f14cc05cab in main ()
+(gdb) x/10gx $rsp
+0x7ffc2f67f040:	0x0000000000000002	0x00007ffc2f67f188
+0x7ffc2f67f050:	0x00007ffc2f67f178	0x000000014cc05d60
+0x7ffc2f67f060:	0x0000000100000000	0x0f819e437dcf7f7b
+0x7ffc2f67f070:	0xcd323249cbc8cc04	0xf90dd1d47719db00
+0x7ffc2f67f080:	0x0000000000000000	0x00007fb57f356083
+(gdb) 0x0f819e437dcf7f7bQuit
+(gdb) c
+Continuing.
+The random value has been set!
+
+Random value: 0x0f819e437dcf7f7b
+You input: f819e437dcf7f7b
+The correct answer is: f819e437dcf7f7b
+
+Breakpoint 2, 0x000055f14cc05d2b in main ()
+(gdb) c
+Continuing.
+
+Breakpoint 3, 0x000055f14cc05ca6 in main ()
+(gdb) x/10gx $rsp
+0x7ffc2f67f040:	0x0000000000000002	0x00007ffc2f67f188
+0x7ffc2f67f050:	0x00007ffc2f67f178	0x000000014cc05d60
+0x7ffc2f67f060:	0x0000000200000000	0x0f819e437dcf7f7b
+0x7ffc2f67f070:	0x0f819e437dcf7f7b	0xf90dd1d47719db00
+0x7ffc2f67f080:	0x0000000000000000	0x00007fb57f356083
+(gdb) c
+Continuing.
+
+Breakpoint 4, 0x000055f14cc05cab in main ()
+(gdb) x/10gx $rs
+Value can't be converted to integer.
+(gdb) x/10gx $rsp
+0x7ffc2f67f040:	0x0000000000000002	0x00007ffc2f67f188
+0x7ffc2f67f050:	0x00007ffc2f67f178	0x000000014cc05d60
+0x7ffc2f67f060:	0x0000000200000000	0x22f7fce9dd0f5e62
+0x7ffc2f67f070:	0x0f819e437dcf7f7b	0xf90dd1d47719db00
+0x7ffc2f67f080:	0x0000000000000000	0x00007fb57f356083
+(gdb) c
+Continuing.
+The random value has been set!
+
+Random value: 0x22f7fce9dd0f5e62
+You input: 22f7fce9dd0f5e62
+The correct answer is: 22f7fce9dd0f5e62
+
+Breakpoint 2, 0x000055f14cc05d2b in main ()
+(gdb) c
+Continuing.
+
+Breakpoint 3, 0x000055f14cc05ca6 in main ()
+(gdb) c
+Continuing.
+
+Breakpoint 4, 0x000055f14cc05cab in main ()
+(gdb) x/10gx $rsp
+0x7ffc2f67f040:	0x0000000000000002	0x00007ffc2f67f188
+0x7ffc2f67f050:	0x00007ffc2f67f178	0x000000014cc05d60
+0x7ffc2f67f060:	0x0000000300000000	0xdc751f272eb9f332
+0x7ffc2f67f070:	0x22f7fce9dd0f5e62	0xf90dd1d47719db00
+0x7ffc2f67f080:	0x0000000000000000	0x00007fb57f356083
+(gdb) c
+Continuing.
+The random value has been set!
+
+Random value: 0xdc751f272eb9f332
+You input: dc751f272eb9f332
+The correct answer is: dc751f272eb9f332
+
+Breakpoint 2, 0x000055f14cc05d2b in main ()
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x000055f14cc05d3a in main ()
+(gdb) c
+Continuing.
+You win! Here is your flag:
+pwn.college{oQR2KthGjaEc8PmqCSEb0Q10QDV.01N0IDLzEjNzIzW}
+
+
+[Inferior 1 (process 3156) exited normally]
+(gdb) 

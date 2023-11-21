@@ -1,0 +1,22 @@
+GDB is a very powerful dynamic analysis tool which you can use in order to understand the state of a program throughout
+its execution. You will become familiar with some of gdb's capabilities in this module.
+
+As we demonstrated in the previous level, gdb has FULL control over the target process. Under normal circumstances, gdb
+running as your regular user cannot attach to a privileged process. This is why gdb isn't a massive security issue which
+would allow you to just immediately solve all the levels. Nevertheless, gdb is still an extremely powerful tool.
+
+Running within this elevated instance of gdb gives you elevated control over the entire system. To clearly demonstrate
+this, see what happens when you run the command `call (void)win()`. As it turns out, all of the levels in this module
+can be solved in this way.
+
+GDB is very powerful!
+
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x0000562ad738abb7 in main ()
+(gdb) call (void)win()
+You win! Here is your flag:
+pwn.college{wdBqLR1pTh4Xa2rOmIHtBHeU0me.0FM1IDLzEjNzIzW}
+
+
+(gdb) 

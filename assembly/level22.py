@@ -22,7 +22,7 @@ shellcode= asm('''
                 cmp bl,90
                 ja next
                 nop
-                mov dil,bl
+                mov dil,bl 
                 mov rdx,rax
                 mov rcx,0x403000
                 call rcx

@@ -1,0 +1,200 @@
+GNU gdb (Ubuntu 9.2-0ubuntu1~20.04.1) 9.2
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from /challenge/embryogdb_level8...
+(No debugging symbols found in /challenge/embryogdb_level8)
+(gdb) break win
+Breakpoint 1 at 0x1951
+(gdb) run
+Starting program: /challenge/embryogdb_level8 
+###
+### Welcome to /challenge/embryogdb_level8!
+###
+
+GDB is a very powerful dynamic analysis tool which you can use in order to understand the state of a program throughout
+its execution. You will become familiar with some of gdb's capabilities in this module.
+
+As we demonstrated in the previous level, gdb has FULL control over the target process. Under normal circumstances, gdb
+running as your regular user cannot attach to a privileged process. This is why gdb isn't a massive security issue which
+would allow you to just immediately solve all the levels. Nevertheless, gdb is still an extremely powerful tool.
+
+Running within this elevated instance of gdb gives you elevated control over the entire system. To clearly demonstrate
+this, see what happens when you run the command `call (void)win()`.
+
+Note that this will _not_ get you the flag (it seems that we broke the win function!), so you'll need to work a bit
+harder to get this flag!
+
+As it turns out, all of the levels other levels in module could be solved in this way.
+
+GDB is very powerful!
+
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x000055bb1ed5bb99 in main ()
+(gdb) c
+Continuing.
+[Inferior 1 (process 4810) exited with code 052]
+(gdb) run
+Starting program: /challenge/embryogdb_level8 
+###
+### Welcome to /challenge/embryogdb_level8!
+###
+
+GDB is a very powerful dynamic analysis tool which you can use in order to understand the state of a program throughout
+its execution. You will become familiar with some of gdb's capabilities in this module.
+
+As we demonstrated in the previous level, gdb has FULL control over the target process. Under normal circumstances, gdb
+running as your regular user cannot attach to a privileged process. This is why gdb isn't a massive security issue which
+would allow you to just immediately solve all the levels. Nevertheless, gdb is still an extremely powerful tool.
+
+Running within this elevated instance of gdb gives you elevated control over the entire system. To clearly demonstrate
+this, see what happens when you run the command `call (void)win()`.
+
+Note that this will _not_ get you the flag (it seems that we broke the win function!), so you'll need to work a bit
+harder to get this flag!
+
+As it turns out, all of the levels other levels in module could be solved in this way.
+
+GDB is very powerful!
+
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x00005556b0e5eb99 in main ()
+(gdb) break win
+Note: breakpoint 1 also set at pc 0x5556b0e5e951.
+Breakpoint 2 at 0x5556b0e5e951
+(gdb) break *win
+Note: breakpoints 1 and 2 also set at pc 0x5556b0e5e951.
+Breakpoint 3 at 0x5556b0e5e951
+(gdb) c
+Continuing.
+[Inferior 1 (process 4841) exited with code 052]
+(gdb) run
+Starting program: /challenge/embryogdb_level8 
+###
+### Welcome to /challenge/embryogdb_level8!
+###
+
+GDB is a very powerful dynamic analysis tool which you can use in order to understand the state of a program throughout
+its execution. You will become familiar with some of gdb's capabilities in this module.
+
+As we demonstrated in the previous level, gdb has FULL control over the target process. Under normal circumstances, gdb
+running as your regular user cannot attach to a privileged process. This is why gdb isn't a massive security issue which
+would allow you to just immediately solve all the levels. Nevertheless, gdb is still an extremely powerful tool.
+
+Running within this elevated instance of gdb gives you elevated control over the entire system. To clearly demonstrate
+this, see what happens when you run the command `call (void)win()`.
+
+Note that this will _not_ get you the flag (it seems that we broke the win function!), so you'll need to work a bit
+harder to get this flag!
+
+As it turns out, all of the levels other levels in module could be solved in this way.
+
+GDB is very powerful!
+
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x0000560627293b99 in main ()
+(gdb) run win
+The program being debugged has been started already.
+Start it from the beginning? (y or n) n
+Program not restarted.
+(gdb) call win
+$1 = {<text variable, no debug info>} 0x560627293951 <win>
+(gdb) jump win
+Continuing at 0x560627293951.
+
+Breakpoint 1, 0x0000560627293951 in win ()
+(gdb) disassemble 
+Dump of assembler code for function win:
+=> 0x0000560627293951 <+0>:	endbr64 
+   0x0000560627293955 <+4>:	push   rbp
+   0x0000560627293956 <+5>:	mov    rbp,rsp
+   0x0000560627293959 <+8>:	sub    rsp,0x10
+   0x000056062729395d <+12>:	mov    QWORD PTR [rbp-0x8],0x0
+   0x0000560627293965 <+20>:	mov    rax,QWORD PTR [rbp-0x8]
+   0x0000560627293969 <+24>:	mov    eax,DWORD PTR [rax]
+   0x000056062729396b <+26>:	lea    edx,[rax+0x1]
+   0x000056062729396e <+29>:	mov    rax,QWORD PTR [rbp-0x8]
+   0x0000560627293972 <+33>:	mov    DWORD PTR [rax],edx
+   0x0000560627293974 <+35>:	lea    rdi,[rip+0x73e]        # 0x5606272940b9
+   0x000056062729397b <+42>:	call   0x560627293180 <puts@plt>
+   0x0000560627293980 <+47>:	mov    esi,0x0
+   0x0000560627293985 <+52>:	lea    rdi,[rip+0x749]        # 0x5606272940d5
+   0x000056062729398c <+59>:	mov    eax,0x0
+   0x0000560627293991 <+64>:	call   0x560627293240 <open@plt>
+   0x0000560627293996 <+69>:	mov    DWORD PTR [rip+0x26a4],eax        # 0x560627296040 <flag_fd.5712>
+   0x000056062729399c <+75>:	mov    eax,DWORD PTR [rip+0x269e]        # 0x560627296040 <flag_fd.5712>
+   0x00005606272939a2 <+81>:	test   eax,eax
+   0x00005606272939a4 <+83>:	jns    0x5606272939ef <win+158>
+   0x00005606272939a6 <+85>:	call   0x560627293170 <__errno_location@plt>
+   0x00005606272939ab <+90>:	mov    eax,DWORD PTR [rax]
+   0x00005606272939ad <+92>:	mov    edi,eax
+   0x00005606272939af <+94>:	call   0x560627293270 <strerror@plt>
+   0x00005606272939b4 <+99>:	mov    rsi,rax
+   0x00005606272939b7 <+102>:	lea    rdi,[rip+0x722]        # 0x5606272940e0
+   0x00005606272939be <+109>:	mov    eax,0x0
+   0x00005606272939c3 <+114>:	call   0x5606272931c0 <printf@plt>
+   0x00005606272939c8 <+119>:	call   0x5606272931f0 <geteuid@plt>
+   0x00005606272939cd <+124>:	test   eax,eax
+   0x00005606272939cf <+126>:	je     0x560627293a66 <win+277>
+   0x00005606272939d5 <+132>:	lea    rdi,[rip+0x734]        # 0x560627294110
+   0x00005606272939dc <+139>:	call   0x560627293180 <puts@plt>
+   0x00005606272939e1 <+144>:	lea    rdi,[rip+0x750]        # 0x560627294138
+   0x00005606272939e8 <+151>:	call   0x560627293180 <puts@plt>
+   0x00005606272939ed <+156>:	jmp    0x560627293a66 <win+277>
+   0x00005606272939ef <+158>:	mov    eax,DWORD PTR [rip+0x264b]        # 0x560627296040 <flag_fd.5712>
+   0x00005606272939f5 <+164>:	mov    edx,0x100
+   0x00005606272939fa <+169>:	lea    rsi,[rip+0x265f]        # 0x560627296060 <flag.5711>
+   0x0000560627293a01 <+176>:	mov    edi,eax
+   0x0000560627293a03 <+178>:	call   0x560627293200 <read@plt>
+   0x0000560627293a08 <+183>:	mov    DWORD PTR [rip+0x2752],eax        # 0x560627296160 <flag_length.5713>
+   0x0000560627293a0e <+189>:	mov    eax,DWORD PTR [rip+0x274c]        # 0x560627296160 <flag_length.5713>
+   0x0000560627293a14 <+195>:	test   eax,eax
+   0x0000560627293a16 <+197>:	jg     0x560627293a3c <win+235>
+   0x0000560627293a18 <+199>:	call   0x560627293170 <__errno_location@plt>
+   0x0000560627293a1d <+204>:	mov    eax,DWORD PTR [rax]
+   0x0000560627293a1f <+206>:	mov    edi,eax
+   0x0000560627293a21 <+208>:	call   0x560627293270 <strerror@plt>
+   0x0000560627293a26 <+213>:	mov    rsi,rax
+   0x0000560627293a29 <+216>:	lea    rdi,[rip+0x760]        # 0x560627294190
+   0x0000560627293a30 <+223>:	mov    eax,0x0
+   0x0000560627293a35 <+228>:	call   0x5606272931c0 <printf@plt>
+   0x0000560627293a3a <+233>:	jmp    0x560627293a67 <win+278>
+--Type <RET> for more, q to quit, c to continue without paging-- 
+   0x0000560627293a3c <+235>:	mov    eax,DWORD PTR [rip+0x271e]        # 0x560627296160 <flag_length.5713>
+   0x0000560627293a42 <+241>:	cdqe   
+   0x0000560627293a44 <+243>:	mov    rdx,rax
+   0x0000560627293a47 <+246>:	lea    rsi,[rip+0x2612]        # 0x560627296060 <flag.5711>
+   0x0000560627293a4e <+253>:	mov    edi,0x1
+   0x0000560627293a53 <+258>:	call   0x5606272931a0 <write@plt>
+   0x0000560627293a58 <+263>:	lea    rdi,[rip+0x75b]        # 0x5606272941ba
+   0x0000560627293a5f <+270>:	call   0x560627293180 <puts@plt>
+   0x0000560627293a64 <+275>:	jmp    0x560627293a67 <win+278>
+   0x0000560627293a66 <+277>:	nop
+   0x0000560627293a67 <+278>:	leave  
+   0x0000560627293a68 <+279>:	ret    
+End of assembler dump.
+(gdb) 
+(gdb) jump 0x000056062729397b
+Function "0x000056062729397b" not defined.
+(gdb) jump *0x000056062729397b
+Continuing at 0x56062729397b.
+
+pwn.college{4xE2eo-W5snco3jHZv1gmgy83OK.dlzMzMDLzEjNzIzW}
+
+
+[Inferior 1 (process 4876) exited with code 02]
+(gdb) 

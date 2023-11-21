@@ -1,0 +1,282 @@
+GDB is a very powerful dynamic analysis tool which you can use in order to understand the state of a program throughout
+its execution. You will become familiar with some of gdb's capabilities in this module.
+
+You can examine the contents of memory using the `x/<n><u><f> <address>` parameterized command. In this format `<u>` is
+the unit size to display, `<f>` is the format to display it in, and `<n>` is the number of elements to display. Valid
+unit sizes are `b` (1 byte), `h` (2 bytes), `w` (4 bytes), and `g` (8 bytes). Valid formats are `d` (decimal), `x`
+(hexadecimal), `s` (string) and `i` (instruction). The address can be specified using a register name, symbol name, or
+absolute address. Additionally, you can supply mathematical expressions when specifying the address.
+
+For example, `x/8i $rip` will print the next 8 instructions from the current instruction pointer. `x/16i main` will
+print the first 16 instructions of main. You can also use `disassemble main`, or `disas main` for short, to print all of
+the instructions of main. Alternatively, `x/16gx $rsp` will print the first 16 values on the stack. `x/gx $rbp-0x32`
+will print the local variable stored there on the stack.
+
+You will probably want to view your instructions using the CORRECT assembly syntax. You can do that with the command
+`set disassembly-flavor intel`.
+
+In order to solve this level, you must figure out the random value on the stack (the value read in from `/dev/urandom`).
+Think about what the arguments to the read system call are.
+
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x000055ac2782ac1f in main ()
+(gdb) c
+Continuing.
+The random value has been set!
+
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x000055ac2782ac64 in main ()
+(gdb) x/10gx $rsp
+0x7ffd79e4b210:	0x0000000000000002	0x00007ffd79e4b358
+0x7ffd79e4b220:	0x00007ffd79e4b348	0x000000012782ad10
+0x7ffd79e4b230:	0x0000000000000000	0x9244144100106285
+0x7ffd79e4b240:	0x00007ffd79e4b340	0xcce303354b615400
+0x7ffd79e4b250:	0x0000000000000000	0x00007f57619bc083
+(gdb) c
+Continuing.
+Random value: 0x9244144100106285
+You input: 9244144100106285
+The correct answer is: 9244144100106285
+You win! Here is your flag:
+
+----- RUN 2
+
+You can examine the contents of memory using the `x/<n><u><f> <address>` parameterized command. In this format `<u>` is
+the unit size to display, `<f>` is the format to display it in, and `<n>` is the number of elements to display. Valid
+unit sizes are `b` (1 byte), `h` (2 bytes), `w` (4 bytes), and `g` (8 bytes). Valid formats are `d` (decimal), `x`
+(hexadecimal), `s` (string) and `i` (instruction). The address can be specified using a register name, symbol name, or
+absolute address. Additionally, you can supply mathematical expressions when specifying the address.
+
+For example, `x/8i $rip` will print the next 8 instructions from the current instruction pointer. `x/16i main` will
+print the first 16 instructions of main. You can also use `disassemble main`, or `disas main` for short, to print all of
+the instructions of main. Alternatively, `x/16gx $rsp` will print the first 16 values on the stack. `x/gx $rbp-0x32`
+will print the local variable stored there on the stack.
+
+You will probably want to view your instructions using the CORRECT assembly syntax. You can do that with the command
+`set disassembly-flavor intel`.
+
+In order to solve this level, you must figure out the random value on the stack (the value read in from `/dev/urandom`).
+Think about what the arguments to the read system call are.
+
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x000055ccd2d82c1f in main ()
+(gdb) disassemble 
+Dump of assembler code for function main:
+   0x000055ccd2d82aa6 <+0>:	endbr64 
+   0x000055ccd2d82aaa <+4>:	push   rbp
+   0x000055ccd2d82aab <+5>:	mov    rbp,rsp
+   0x000055ccd2d82aae <+8>:	sub    rsp,0x40
+   0x000055ccd2d82ab2 <+12>:	mov    DWORD PTR [rbp-0x24],edi
+   0x000055ccd2d82ab5 <+15>:	mov    QWORD PTR [rbp-0x30],rsi
+   0x000055ccd2d82ab9 <+19>:	mov    QWORD PTR [rbp-0x38],rdx
+   0x000055ccd2d82abd <+23>:	mov    rax,QWORD PTR fs:0x28
+   0x000055ccd2d82ac6 <+32>:	mov    QWORD PTR [rbp-0x8],rax
+   0x000055ccd2d82aca <+36>:	xor    eax,eax
+   0x000055ccd2d82acc <+38>:	cmp    DWORD PTR [rbp-0x24],0x0
+   0x000055ccd2d82ad0 <+42>:	jg     0x55ccd2d82af1 <main+75>
+   0x000055ccd2d82ad2 <+44>:	lea    rcx,[rip+0xdb8]        # 0x55ccd2d83891 <__PRETTY_FUNCTION__.5345>
+   0x000055ccd2d82ad9 <+51>:	mov    edx,0x51
+   0x000055ccd2d82ade <+56>:	lea    rsi,[rip+0x54c]        # 0x55ccd2d83031
+   0x000055ccd2d82ae5 <+63>:	lea    rdi,[rip+0x6d0]        # 0x55ccd2d831bc
+   0x000055ccd2d82aec <+70>:	call   0x55ccd2d821f0 <__assert_fail@plt>
+   0x000055ccd2d82af1 <+75>:	lea    rdi,[rip+0x6cd]        # 0x55ccd2d831c5
+   0x000055ccd2d82af8 <+82>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82afd <+87>:	mov    rax,QWORD PTR [rbp-0x30]
+   0x000055ccd2d82b01 <+91>:	mov    rax,QWORD PTR [rax]
+   0x000055ccd2d82b04 <+94>:	mov    rsi,rax
+   0x000055ccd2d82b07 <+97>:	lea    rdi,[rip+0x6bb]        # 0x55ccd2d831c9
+   0x000055ccd2d82b0e <+104>:	mov    eax,0x0
+   0x000055ccd2d82b13 <+109>:	call   0x55ccd2d821d0 <printf@plt>
+   0x000055ccd2d82b18 <+114>:	lea    rdi,[rip+0x6a6]        # 0x55ccd2d831c5
+   0x000055ccd2d82b1f <+121>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82b24 <+126>:	mov    edi,0xa
+   0x000055ccd2d82b29 <+131>:	call   0x55ccd2d82170 <putchar@plt>
+   0x000055ccd2d82b2e <+136>:	mov    rax,QWORD PTR [rip+0x24eb]        # 0x55ccd2d85020 <stdin@@GLIBC_2.2.5>
+   0x000055ccd2d82b35 <+143>:	mov    ecx,0x0
+   0x000055ccd2d82b3a <+148>:	mov    edx,0x2
+   0x000055ccd2d82b3f <+153>:	mov    esi,0x0
+   0x000055ccd2d82b44 <+158>:	mov    rdi,rax
+   0x000055ccd2d82b47 <+161>:	call   0x55ccd2d82240 <setvbuf@plt>
+   0x000055ccd2d82b4c <+166>:	mov    rax,QWORD PTR [rip+0x24bd]        # 0x55ccd2d85010 <stdout@@GLIBC_2.2.5>
+   0x000055ccd2d82b53 <+173>:	mov    ecx,0x1
+   0x000055ccd2d82b58 <+178>:	mov    edx,0x2
+   0x000055ccd2d82b5d <+183>:	mov    esi,0x0
+   0x000055ccd2d82b62 <+188>:	mov    rdi,rax
+   0x000055ccd2d82b65 <+191>:	call   0x55ccd2d82240 <setvbuf@plt>
+   0x000055ccd2d82b6a <+196>:	lea    rdi,[rip+0x66f]        # 0x55ccd2d831e0
+   0x000055ccd2d82b71 <+203>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82b76 <+208>:	lea    rdi,[rip+0x6db]        # 0x55ccd2d83258
+   0x000055ccd2d82b7d <+215>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82b82 <+220>:	lea    rdi,[rip+0x72f]        # 0x55ccd2d832b8
+   0x000055ccd2d82b89 <+227>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82b8e <+232>:	lea    rdi,[rip+0x79b]        # 0x55ccd2d83330
+   0x000055ccd2d82b95 <+239>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82b9a <+244>:	lea    rdi,[rip+0x807]        # 0x55ccd2d833a8
+   0x000055ccd2d82ba1 <+251>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82ba6 <+256>:	lea    rdi,[rip+0x873]        # 0x55ccd2d83420
+   0x000055ccd2d82bad <+263>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82bb2 <+268>:	lea    rdi,[rip+0x8df]        # 0x55ccd2d83498
+   0x000055ccd2d82bb9 <+275>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82bbe <+280>:	lea    rdi,[rip+0x93b]        # 0x55ccd2d83500
+   0x000055ccd2d82bc5 <+287>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82bca <+292>:	lea    rdi,[rip+0x9a7]        # 0x55ccd2d83578
+   0x000055ccd2d82bd1 <+299>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82bd6 <+304>:	lea    rdi,[rip+0xa1b]        # 0x55ccd2d835f8
+   0x000055ccd2d82bdd <+311>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82be2 <+316>:	lea    rdi,[rip+0xa87]        # 0x55ccd2d83670
+   0x000055ccd2d82be9 <+323>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82bee <+328>:	lea    rdi,[rip+0xabb]        # 0x55ccd2d836b0
+   0x000055ccd2d82bf5 <+335>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82bfa <+340>:	lea    rdi,[rip+0xb27]        # 0x55ccd2d83728
+   0x000055ccd2d82c01 <+347>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82c06 <+352>:	lea    rdi,[rip+0xb43]        # 0x55ccd2d83750
+   0x000055ccd2d82c0d <+359>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82c12 <+364>:	lea    rdi,[rip+0xbb7]        # 0x55ccd2d837d0
+   0x000055ccd2d82c19 <+371>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82c1e <+376>:	int3   
+=> 0x000055ccd2d82c1f <+377>:	nop
+   0x000055ccd2d82c20 <+378>:	mov    DWORD PTR [rbp-0x1c],0x0
+   0x000055ccd2d82c27 <+385>:	jmp    0x55ccd2d82cd9 <main+563>
+   0x000055ccd2d82c2c <+390>:	mov    esi,0x0
+   0x000055ccd2d82c31 <+395>:	lea    rdi,[rip+0xbd5]        # 0x55ccd2d8380d
+   0x000055ccd2d82c38 <+402>:	mov    eax,0x0
+   0x000055ccd2d82c3d <+407>:	call   0x55ccd2d82250 <open@plt>
+   0x000055ccd2d82c42 <+412>:	mov    ecx,eax
+   0x000055ccd2d82c44 <+414>:	lea    rax,[rbp-0x18]
+   0x000055ccd2d82c48 <+418>:	mov    edx,0x8
+   0x000055ccd2d82c4d <+423>:	mov    rsi,rax
+   0x000055ccd2d82c50 <+426>:	mov    edi,ecx
+   0x000055ccd2d82c52 <+428>:	call   0x55ccd2d82210 <read@plt>
+   0x000055ccd2d82c57 <+433>:	lea    rdi,[rip+0xbc2]        # 0x55ccd2d83820
+   0x000055ccd2d82c5e <+440>:	call   0x55ccd2d82190 <puts@plt>
+   0x000055ccd2d82c63 <+445>:	int3   
+   0x000055ccd2d82c64 <+446>:	nop
+   0x000055ccd2d82c65 <+447>:	lea    rdi,[rip+0xbd4]        # 0x55ccd2d83840
+   0x000055ccd2d82c6c <+454>:	mov    eax,0x0
+   0x000055ccd2d82c71 <+459>:	call   0x55ccd2d821d0 <printf@plt>
+   0x000055ccd2d82c76 <+464>:	lea    rax,[rbp-0x10]
+   0x000055ccd2d82c7a <+468>:	mov    rsi,rax
+   0x000055ccd2d82c7d <+471>:	lea    rdi,[rip+0xbcb]        # 0x55ccd2d8384f
+   0x000055ccd2d82c84 <+478>:	mov    eax,0x0
+--Type <RET> for more, q to quit, c to continue without paging--breakc
+   0x000055ccd2d82c89 <+483>:	call   0x55ccd2d82260 <__isoc99_scanf@plt>
+   0x000055ccd2d82c8e <+488>:	mov    rax,QWORD PTR [rbp-0x10]
+   0x000055ccd2d82c92 <+492>:	mov    rsi,rax
+   0x000055ccd2d82c95 <+495>:	lea    rdi,[rip+0xbb8]        # 0x55ccd2d83854
+   0x000055ccd2d82c9c <+502>:	mov    eax,0x0
+   0x000055ccd2d82ca1 <+507>:	call   0x55ccd2d821d0 <printf@plt>
+   0x000055ccd2d82ca6 <+512>:	mov    rax,QWORD PTR [rbp-0x18]
+   0x000055ccd2d82caa <+516>:	mov    rsi,rax
+   0x000055ccd2d82cad <+519>:	lea    rdi,[rip+0xbb1]        # 0x55ccd2d83865
+   0x000055ccd2d82cb4 <+526>:	mov    eax,0x0
+   0x000055ccd2d82cb9 <+531>:	call   0x55ccd2d821d0 <printf@plt>
+   0x000055ccd2d82cbe <+536>:	mov    rdx,QWORD PTR [rbp-0x10]
+   0x000055ccd2d82cc2 <+540>:	mov    rax,QWORD PTR [rbp-0x18]
+   0x000055ccd2d82cc6 <+544>:	cmp    rdx,rax
+   0x000055ccd2d82cc9 <+547>:	je     0x55ccd2d82cd5 <main+559>
+   0x000055ccd2d82ccb <+549>:	mov    edi,0x1
+   0x000055ccd2d82cd0 <+554>:	call   0x55ccd2d82280 <exit@plt>
+   0x000055ccd2d82cd5 <+559>:	add    DWORD PTR [rbp-0x1c],0x1
+   0x000055ccd2d82cd9 <+563>:	cmp    DWORD PTR [rbp-0x1c],0x0
+   0x000055ccd2d82cdd <+567>:	jle    0x55ccd2d82c2c <main+390>
+   0x000055ccd2d82ce3 <+573>:	mov    eax,0x0
+   0x000055ccd2d82ce8 <+578>:	call   0x55ccd2d8297d <win>
+   0x000055ccd2d82ced <+583>:	mov    eax,0x0
+   0x000055ccd2d82cf2 <+588>:	mov    rcx,QWORD PTR [rbp-0x8]
+   0x000055ccd2d82cf6 <+592>:	xor    rcx,QWORD PTR fs:0x28
+   0x000055ccd2d82cff <+601>:	je     0x55ccd2d82d06 <main+608>
+   0x000055ccd2d82d01 <+603>:	call   0x55ccd2d821c0 <__stack_chk_fail@plt>
+   0x000055ccd2d82d06 <+608>:	leave  
+   0x000055ccd2d82d07 <+609>:	ret    
+End of assembler dump.
+(gdb) break *0x000055ccd2d82c52
+Breakpoint 3 at 0x55ccd2d82c52
+(gdb) c
+Continuing.
+
+Breakpoint 3, 0x000055ccd2d82c52 in main ()
+(gdb) info registers
+rax            0x7ffc2fb5a6d8      140721108920024
+rbx            0x55ccd2d82d10      94338199072016
+rcx            0x3                 3
+rdx            0x8                 8
+rsi            0x7ffc2fb5a6d8      140721108920024
+rdi            0x3                 3
+rbp            0x7ffc2fb5a6f0      0x7ffc2fb5a6f0
+rsp            0x7ffc2fb5a6b0      0x7ffc2fb5a6b0
+r8             0x3d                61
+r9             0x2c                44
+r10            0x0                 0
+r11            0x246               582
+r12            0x55ccd2d822a0      94338199069344
+r13            0x7ffc2fb5a7e0      140721108920288
+r14            0x0                 0
+r15            0x0                 0
+rip            0x55ccd2d82c52      0x55ccd2d82c52 <main+428>
+eflags         0x202               [ IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+(gdb) x/10gx $rsp
+0x7ffc2fb5a6b0:	0x0000000000000002	0x00007ffc2fb5a7f8
+0x7ffc2fb5a6c0:	0x00007ffc2fb5a7e8	0x00000001d2d82d10
+0x7ffc2fb5a6d0:	0x0000000000000000	0x000055ccd2d822a0
+0x7ffc2fb5a6e0:	0x00007ffc2fb5a7e0	0x4f60a4f2c2369700
+0x7ffc2fb5a6f0:	0x0000000000000000	0x00007fe61772a083
+(gdb) ni
+0x000055ccd2d82c57 in main ()
+(gdb) x/10gx $rsp
+0x7ffc2fb5a6b0:	0x0000000000000002	0x00007ffc2fb5a7f8
+0x7ffc2fb5a6c0:	0x00007ffc2fb5a7e8	0x00000001d2d82d10
+0x7ffc2fb5a6d0:	0x0000000000000000	0x4ab5efe18abd429f
+0x7ffc2fb5a6e0:	0x00007ffc2fb5a7e0	0x4f60a4f2c2369700
+0x7ffc2fb5a6f0:	0x0000000000000000	0x00007fe61772a083
+(gdb) info registers
+rax            0x8                 8
+rbx            0x55ccd2d82d10      94338199072016
+rcx            0x7fe617813fd2      140626213552082
+rdx            0x8                 8
+rsi            0x7ffc2fb5a6d8      140721108920024
+rdi            0x3                 3
+rbp            0x7ffc2fb5a6f0      0x7ffc2fb5a6f0
+rsp            0x7ffc2fb5a6b0      0x7ffc2fb5a6b0
+r8             0x3d                61
+r9             0x2c                44
+r10            0x0                 0
+r11            0x246               582
+r12            0x55ccd2d822a0      94338199069344
+r13            0x7ffc2fb5a7e0      140721108920288
+r14            0x0                 0
+r15            0x0                 0
+rip            0x55ccd2d82c57      0x55ccd2d82c57 <main+433>
+eflags         0x203               [ CF IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+(gdb) c
+Continuing.
+The random value has been set!
+
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x000055ccd2d82c64 in main ()
+(gdb) c
+Continuing.
+Random value: 0x4ab5efe18abd429f
+You input: 4ab5efe18abd429f
+The correct answer is: 4ab5efe18abd429f
+You win! Here is your flag:
+pwn.college{E9fQEY0V34h3aRjIy3ohrXKWb3g.0lN0IDLzEjNzIzW}
+
+
+[Inferior 1 (process 3164) exited normally]
+(gdb) 
